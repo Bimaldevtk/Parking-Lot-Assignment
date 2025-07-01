@@ -1,0 +1,84 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4rem 5rem;
+}
+
+.title {
+  text-transform: uppercase;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 20px;
+}
+.logo {
+  text-transform: uppercase;
+  color: white;
+}
+.easy {
+  color: #fecb21;
+}
+
+.nav_links {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.nav_links a {
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  padding: 0.5rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 20px;
+}
+
+.nav_links a:hover {
+  text-decoration: underline;
+  text-decoration-color: yellow;
+  font-size: 18px;
+}
+
+/* .nav button{
+  <!-- HTML !-->
+<button class="button-32" role="button">Button 32</button> */
+
+/* CSS */
+.button_32 {
+  background-color: #fecb21;
+  border-radius: 12px;
+  color: #000;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 10px 15px;
+  text-align: center;
+  transition: 200ms;
+  width: 100%;
+  box-sizing: border-box;
+  border: 0;
+  font-size: 16px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button_32:not(:disabled):hover,
+.button_32:not(:disabled):focus {
+  outline: 0;
+  background: #fecb21;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2), 0 3px 8px 0 rgba(0, 0, 0, 0.15);
+}
+
+.button_32:disabled {
+  filter: saturate(0.2) opacity(0.5);
+  -webkit-filter: saturate(0.2) opacity(0.5);
+  cursor: not-allowed;
+}

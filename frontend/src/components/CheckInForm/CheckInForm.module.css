@@ -1,0 +1,74 @@
+.main_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  background-color: rgba(66, 66, 66, 0.5);
+  align-items: center;
+  justify-content: center;
+
+  width: 80%;
+  height: 7rem;
+}
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form_content {
+  display: flex;
+  align-items: flex-end;
+  gap: 5rem;
+}
+
+.form_content div {
+  display: flex;
+  flex-direction: column;
+}
+.book_now {
+  padding: 10px 20px;
+  background-color: #ffc107;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.label {
+  font-family: "Poppins", sans-serif;
+  color: white;
+  text-transform: uppercase;
+}
+.select_slot {
+  font-family: "Poppins", sans-serif;
+  color: white;
+  text-transform: uppercase;
+  width: max-content;
+  white-space: nowrap;
+}
+
+.date_wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* .placeholder_text {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: white;
+  pointer-events: none;
+} */
+
+.input {
+  background-color: #111111;
+  height: 30px;
+  width: 100px;
+  color: white;
+}

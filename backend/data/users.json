@@ -1,0 +1,35 @@
+[
+  { "id": 1, "username": "Admin", "password": "admin123", "role": "admin" },
+  {
+    "id": 2,
+    "username": "John",
+    "password": "john123",
+    "role": "user",
+    "isPermanent": false,
+    "vehicleType": "2-wheeler"
+  },
+  {
+    "id": 3,
+    "username": "Alice",
+    "password": "alice123",
+    "role": "user",
+    "isPermanent": true,
+    "vehicleType": "4-wheeler"
+  },
+  {
+    "id": 4,
+    "username": "Bimal",
+    "password": "bimal123",
+    "role": "user",
+    "isPermanent": true,
+    "vehicleType": "4-wheeler"
+  },
+  {
+    "id": 5,
+    "username": "Mahi",
+    "password": "mahi123",
+    "role": "user",
+    "isPermanent": false,
+    "vehicleType": "4-wheeler"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1751273295697,
+    "userId": 5,
+    "slotId": "1",
+    "vehicleType": "4-wheeler",
+    "startDate": "2025-07-01",
+    "endDate": "2025-07-02",
+    "date": "2025-07-01"
+  },
+  {
+    "id": 1751273295697,
+    "userId": 5,
+    "slotId": "1",
+    "vehicleType": "4-wheeler",
+    "startDate": "2025-07-01",
+    "endDate": "2025-07-02",
+    "date": "2025-07-02"
+  },
+  {
+    "id": 1751274331215,
+    "userId": 2,
+    "slotId": "2",
+    "vehicleType": "2-wheeler",
+    "startDate": "2025-07-01",
+    "endDate": "2025-07-02",
+    "date": "2025-07-01"
+  },
+  {
+    "id": 1751274331215,
+    "userId": 2,
+    "slotId": "2",
+    "vehicleType": "2-wheeler",
+    "startDate": "2025-07-01",
+    "endDate": "2025-07-02",
+    "date": "2025-07-02"
+  }
+]

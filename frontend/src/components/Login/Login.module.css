@@ -1,0 +1,48 @@
+/* Login.module.css */
+.container {
+  height: 100vh;
+  background: url("./images/park-login.jpg") no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loginBox {
+  background-color: rgba(0, 0, 0, 0.75);
+  padding: 40px;
+  border-radius: 10px;
+  color: white;
+  width: 300px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffc107; /* Yellow like "EASY" */
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: none;
+}
+
+.button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 15px;
+  background-color: #ffc107;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #e0a800;
+}

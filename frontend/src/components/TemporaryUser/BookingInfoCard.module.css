@@ -1,0 +1,66 @@
+.container {
+  background-color: black;
+  height: 100vh;
+}
+
+.wrapper {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.heading {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.detailsGrid {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.row_item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+.label {
+  font-weight: 500;
+  color: #222;
+  font-family: "Poppins", sans-serif;
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: black;
+  border: 2px solid #e0a800;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+}
+
+.cancelButton:hover {
+  background-color: #e0a800;
+  color: black;
+}

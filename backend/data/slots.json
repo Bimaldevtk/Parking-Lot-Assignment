@@ -1,0 +1,18 @@
+[
+  {
+    "slotId": 1,
+    "lotId": 1,
+    "type": "4-wheeler",
+    "status": "available",
+    "reservedFor": null,
+    "permanentUserId": null
+  },
+  {
+    "slotId": 2,
+    "lotId": 1,
+    "type": "2-wheeler",
+    "status": "available",
+    "reservedFor": "John Doe",
+    "permanentUserId": 5
+  }
+]

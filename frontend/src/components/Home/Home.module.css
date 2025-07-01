@@ -1,0 +1,55 @@
+main {
+  display: flex;
+  flex-direction: row;
+  gap: 4rem;
+}
+
+.background {
+  background-image: url("/images/hero-img.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100%;
+}
+
+.welcome {
+  font-family: "Poppins", sans-serif;
+  font-size: 15px;
+  color: white;
+}
+
+.section_1 {
+  margin: 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5;
+}
+.section_1 .title {
+  font-size: 47px;
+  text-transform: uppercase;
+  font-family: "Poppins", sans-serif;
+  color: white;
+}
+
+.section_1 .easy {
+  font-size: 47px;
+  color: #fecb21;
+}
+
+.section_1 .sentence {
+  color: white;
+  font-family: "Poppins", sans-serif;
+}
+
+.section_2 .title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+  text-transform: uppercase;
+  color: #fecb21;
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-size: 20px;
+}
