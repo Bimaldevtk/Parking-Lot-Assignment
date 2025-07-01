@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import CancelRelease from "./CancelRelease";
 import styles from "./PermanentUser.module.css";
 import ReleaseSlot from "./ReleaseSlot";
-import Navbar from "../Navbar/NavBar";
-
+import Navbar from "../../components/Navbar/NavBar";
 export default function PermanentUser() {
   const [hasRelease, setHasRelease] = useState(false);
   const user = JSON.parse(localStorage.getItem("userInfo"));

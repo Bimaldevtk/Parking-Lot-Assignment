@@ -1,8 +1,11 @@
 export const initialState = {
   startDate: "",
   endDate: "",
-  selectedSlotId: "",
+  vehicleType: "",
+  vehicleNumber: "",
   availableSlots: [],
+  selectedSlotId: null,
+  showResults: false,
 };
 
 export function formReducer(state, action) {
@@ -10,7 +13,11 @@ export function formReducer(state, action) {
     case "SET_FIELD":
       return { ...state, [action.field]: action.value };
     case "SET_AVAILABLE_SLOTS":
-      return { ...state, availableSlots: action.payload };
+      return {
+        ...state,
+        availableSlots: action.payload,
+        showResults: true,
+      };
     case "RESET":
       return initialState;
     default:

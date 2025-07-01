@@ -1,55 +1,34 @@
-export const fetchAvailableSlots = async (state, dispatch) => {
+export const fetchAvailableSlots = async (formState) => {
+  const { startDate, endDate, vehicleType } = formState;
+
   try {
-    const res = await fetch("http://localhost:3001/api/bookings/available");
-    const data = await res.json();
-
-    const allDates = [];
-    let curr = new Date(state.startDate);
-
-    while (curr <= new Date(state.endDate)) {
-      allDates.push(curr.toISOString().split("T")[0]);
-      curr.setDate(curr.getDate() + 1);
-    }
-
-    const slotMap = {};
-
-    data.forEach((slot) => {
-      if (!slotMap[slot.slotId]) {
-        slotMap[slot.slotId] = { ...slot, availableDates: [slot.date] };
-      } else {
-        slotMap[slot.slotId].availableDates.push(slot.date);
-      }
-    });
-
-    const matchedSlots = Object.values(slotMap).filter((slot) =>
-      allDates.every((d) => slot.availableDates.includes(d))
+    const res = await fetch(
+      `http://localhost:3001/api/bookings/available?startDate=${startDate}&endDate=${endDate}&vehicleType=${vehicleType}`
     );
-
-    dispatch({ type: "SET_AVAILABLE_SLOTS", payload: matchedSlots });
-  } catch (err) {
-    console.error("Failed to fetch available slots:", err);
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching slots:", error);
+    return [];
   }
 };
 
-export const createBooking = async (bookingPayload, navigate) => {
-  try {
-    const res = await fetch("http://localhost:3001/api/bookings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bookingPayload),
-    });
+export const createBooking = async (payload) => {
+  const res = await fetch("http://localhost:3001/api/bookings", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
 
-    const result = await res.json();
-
-    if (res.ok) {
-      alert(result.message || "Booking successful!");
-      navigate("/booked");
-    } else {
-      alert(result.error || "Booking failed.");
-    }
-  } catch (err) {
-    console.error("Booking error:", err);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.error || "Booking failed");
   }
+
+  const data = await res.json();
+  return data.bookings?.[0]; // return the first new booking with ID
 };
 
 export const fetchBooking = async (userId) => {

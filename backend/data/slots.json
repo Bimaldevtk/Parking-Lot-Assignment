@@ -3,16 +3,31 @@
     "slotId": 1,
     "lotId": 1,
     "type": "4-wheeler",
-    "status": "available",
-    "reservedFor": null,
-    "permanentUserId": null
+    "status": "reserved",
+    "reservedFor": "temporary",
+    "userId": 5,
+    "floorNo": 1,
+    "location": "Smart City InfoPark Kochi"
   },
   {
     "slotId": 2,
     "lotId": 1,
     "type": "2-wheeler",
+    "status": "reserved",
+    "reservedFor": "temporary",
+    "userId": 2,
+    "floorNo": 2,
+    "location": "Smart City InfoPark Kochi"
+  },
+  {
+    "slotId": 4,
+    "lotId": 1,
+    "type": "2-wheeler",
     "status": "available",
-    "reservedFor": "John Doe",
-    "permanentUserId": 5
+    "reservedFor": null,
+    "userId": 5,
+    "floorNo": 1,
+    "location": "Smart City InfoPark Kochi",
+    "permanentUserId": null
   }
 ]

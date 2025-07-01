@@ -25,7 +25,6 @@ export default function Login() {
 
       const data = await response.json();
       const user = data.user;
-      console.log(user);
 
       if (response.ok) {
         dispatch(setUserInfo(user));

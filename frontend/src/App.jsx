@@ -1,9 +1,9 @@
-import Home from "./components/Home/Home";
-import Login from "./components/Login/Login";
 import { Routes, Route } from "react-router-dom";
-import PermanentUser from "./components/PermanentUser/PermanentUser";
-import BookingInfoCard from "./components/TemporaryUser/BookingInfoCard";
-import Navbar from "./components/Navbar/NavBar";
+import Home from "./pages/Home/Home";
+import PermanentUser from "./pages/PermanentUser/PermanentUser";
+import Login from "./pages/Login/Login";
+import TemporaryPage from "./pages/TemporaryUser/TemporaryPage";
+import BookedPage from "./pages/TemporaryUser/BookingPage";
 
 function App() {
   return (
@@ -11,7 +11,8 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/permanent" element={<PermanentUser />} />
-      <Route path="/booked" element={<BookingInfoCard />} />
+      <Route path="/booked" element={<BookedPage />} />
+      <Route path="/temporary" element={<TemporaryPage />} />
     </Routes>
   );
 }

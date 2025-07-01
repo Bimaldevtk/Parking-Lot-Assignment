@@ -1,7 +1,6 @@
 // Bookings APIs
 
 import express from "express";
-import { log } from "node:console";
 import fs from "node:fs/promises";
 
 const router = express.Router();
@@ -14,6 +13,22 @@ router.get("/", async (req, res) => {
 
 router.get("/available", async (req, res) => {
   try {
+    const { startDate, endDate, vehicleType } = req.query;
+
+    if (!startDate || !endDate || !vehicleType) {
+      return res.status(400).json({ error: "Missing query parameters" });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const diffDays = (end - start) / (1000 * 60 * 60 * 24);
+    if (diffDays < 0 || diffDays > 2) {
+      return res
+        .status(400)
+        .json({ error: "Date range must be between 1 and 3 days" });
+    }
+
     const slotsData = await fs.readFile("./data/slots.json", "utf-8");
     const bookingsData = await fs.readFile("./data/bookings.json", "utf-8");
     const releasesData = await fs.readFile("./data/release.json", "utf-8");
@@ -22,46 +37,65 @@ router.get("/available", async (req, res) => {
     const bookings = JSON.parse(bookingsData);
     const releases = JSON.parse(releasesData);
 
-    const today = new Date();
     const formatDate = (date) => date.toISOString().split("T")[0];
 
     const daysToCheck = [];
-    for (let d = 0; d <= 2; d++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + d);
-      daysToCheck.push(formatDate(date));
+    const tempDate = new Date(start);
+    while (tempDate <= end) {
+      daysToCheck.push(formatDate(new Date(tempDate)));
+      tempDate.setDate(tempDate.getDate() + 1);
     }
 
     const availableSlots = [];
 
     for (const slot of slots) {
-      const isPermanent = slot.permanentUserId !== null;
+      if (slot.type !== vehicleType) continue;
 
-      for (const day of daysToCheck) {
-        const isBooked = bookings.some(
-          (b) => b.slotId === slot.slotId && b.date === day
+      if (slot.reservedFor && slot.reservedFor !== "temporary") continue;
+
+      const isPermanent = slot.userId !== null;
+
+      // Check if booked on any of the requested dates
+      const isBookedOnAnyDay = daysToCheck.some((day) =>
+        bookings.some(
+          (b) => String(b.slotId) === String(slot.slotId) && b.date === day
+        )
+      );
+      if (isBookedOnAnyDay) continue;
+
+      // For permanent slot: ensure all days are released
+      if (isPermanent) {
+        const isFullyReleased = daysToCheck.every((day) =>
+          releases.some((r) => {
+            const from = new Date(r.fromDate);
+            const to = new Date(r.toDate);
+            return (
+              String(r.slotId) === String(slot.slotId) &&
+              new Date(day) >= from &&
+              new Date(day) <= to
+            );
+          })
         );
-
-        const isReleased = releases.some((r) => {
-          const from = new Date(r.fromDate);
-          const to = new Date(r.toDate);
-          return (
-            r.slotId === slot.slotId &&
-            new Date(day) >= from &&
-            new Date(day) <= to
-          );
-        });
-
-        if (!isBooked && (!isPermanent || isReleased)) {
-          availableSlots.push({
-            slotId: slot.slotId,
-            lotId: slot.lotId,
-            vehicleType: slot.type,
-            date: day,
-            isFromRelease: isReleased,
-          });
-        }
+        if (!isFullyReleased) continue;
       }
+
+      // ✅ Passed all checks — push only once
+      availableSlots.push({
+        slotId: slot.slotId,
+        floorNo: slot.floorNo,
+        vehicleType: slot.type,
+        location: slot.location,
+        startDate: startDate,
+        endDate: endDate,
+        isFromRelease: isPermanent,
+      });
+    }
+
+    if (availableSlots.length === 0) {
+      return res.status(404).json({
+        message:
+          "No available slots found for selected date range and vehicle type.",
+      });
     }
 
     res.json(availableSlots);
@@ -89,28 +123,36 @@ router.get("/:id", async (req, res) => {
 });
 router.post("/", async (req, res) => {
   try {
-    const { userId, slotId, startDate, endDate, vehicleType } = req.body;
+    const { userId, slotId, startDate, endDate, vehicleType, vehicleNumber } =
+      req.body;
 
-    if (!userId || !slotId || !startDate || !endDate || !vehicleType) {
+    if (
+      !userId ||
+      !slotId ||
+      !startDate ||
+      !endDate ||
+      !vehicleType ||
+      !vehicleNumber
+    ) {
       return res.status(400).json({ error: "Missing required booking fields" });
     }
-    console.log(userId, slotId, startDate, endDate, vehicleType);
 
-    const data = await fs.readFile("./data/bookings.json", "utf-8");
-    let bookings = JSON.parse(data);
+    const bookingsPath = "./data/bookings.json";
+    const slotsPath = "./data/slots.json";
+
+    const bookings = JSON.parse(await fs.readFile(bookingsPath, "utf-8"));
+    let slots = JSON.parse(await fs.readFile(slotsPath, "utf-8"));
 
     const today = new Date();
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    // Check: must start from tomorrow
     if (start <= today) {
       return res
         .status(400)
         .json({ error: "Booking must start from tomorrow or later" });
     }
 
-    // Check: max 3 days
     const dayDiff = (end - start) / (1000 * 60 * 60 * 24);
     if (dayDiff < 0 || dayDiff > 2) {
       return res
@@ -118,7 +160,12 @@ router.post("/", async (req, res) => {
         .json({ error: "You can book for a maximum of 3 days" });
     }
 
-    // Create booking dates
+    const slot = slots.find((s) => s.slotId === slotId);
+    if (!slot) {
+      return res.status(404).json({ error: "Slot not found" });
+    }
+
+    // Generate all booking dates
     const bookingDates = [];
     const curr = new Date(start);
     while (curr <= end) {
@@ -126,57 +173,61 @@ router.post("/", async (req, res) => {
       curr.setDate(curr.getDate() + 1);
     }
 
+    // Check for conflicts
     for (const date of bookingDates) {
-      const hasUser = bookings.find(
-        (b) => b.userId === userId && b.date === date && b.slotId === slotId
-      );
-      if (hasUser) {
-        return res
-          .status(400)
-          .json({ error: `You already booked a slot on ${date}` });
-      }
-
-      const slotTaken = bookings.find(
+      const conflict = bookings.find(
         (b) => b.slotId === slotId && b.date === date
       );
-      if (slotTaken) {
-        return res.status(400).json({ error: `Slot ${slotId} already booked` });
+      if (conflict) {
+        return res
+          .status(400)
+          .json({ error: `Slot ${slotId} is already booked on ${date}` });
+      }
+
+      const userConflict = bookings.find(
+        (b) => b.userId === userId && b.date === date
+      );
+      if (userConflict) {
+        return res
+          .status(400)
+          .json({ error: `User already booked on ${date}` });
       }
     }
 
-    // Add bookings
-    const newBookings = bookingDates.map((date) => ({
-      id: Date.now(),
+    const isPermanent = slot.userId !== null;
+
+    const newBookings = bookingDates.map((date, index) => ({
+      id: Date.now() + index,
       userId,
       slotId,
       vehicleType,
+      vehicleNumber,
       startDate,
       endDate,
       date,
+      floorNo: slot.floorNo,
+      location: slot.location,
+      reservedFor: isPermanent ? "permanent" : "temporary",
+      isFromRelease: isPermanent,
     }));
 
     bookings.push(...newBookings);
 
-    await fs.writeFile(
-      "./data/bookings.json",
-      JSON.stringify(bookings, null, 2)
-    );
-    const slotsPath = "./data/slots.json";
-    const slotsData = await fs.readFile(slotsPath, "utf-8");
-    let slots = JSON.parse(slotsData);
-
-    slots = slots.map((slot) => {
-      if (slot.slotId === slotId) {
+    // Update slot info in slots.json
+    slots = slots.map((s) => {
+      if (s.slotId === slotId) {
         return {
-          ...slot,
+          ...s,
+          userId: userId,
           status: "reserved",
-          reservedFor: reservedFor || `User ${userId}`,
-          permanentUserId: userId,
+          reservedFor: isPermanent ? "permanent" : "temporary",
         };
       }
-      return slot;
+      return s;
     });
 
+    // Write updates to files
+    await fs.writeFile(bookingsPath, JSON.stringify(bookings, null, 2));
     await fs.writeFile(slotsPath, JSON.stringify(slots, null, 2));
 
     res
@@ -191,25 +242,63 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
+  const bookingId = Number(req.params.id);
+
   try {
-    // Read and parse the JSON file
-    const data = await fs.readFile("./data/bookings.json", "utf-8");
-    let bookings = JSON.parse(data);
+    // Load bookings
+    const bookingsData = await fs.readFile("./data/bookings.json", "utf-8");
+    const bookings = JSON.parse(bookingsData);
 
-    // Filter out the booking to be deleted
-    bookings = bookings.filter((b) => b.id != req.params.id);
+    const bookingToCancel = bookings.find((b) => b.id === bookingId);
+    if (!bookingToCancel) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
 
-    // Write updated bookings back to the file
+    // Remove the booking
+    const updatedBookings = bookings.filter((b) => b.id !== bookingId);
     await fs.writeFile(
       "./data/bookings.json",
-      JSON.stringify(bookings, null, 2)
+      JSON.stringify(updatedBookings, null, 2)
     );
 
-    res.json({ message: "Booking cancelled" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Failed to cancel booking", details: error.message });
+    // Restore slot
+    const slotsData = await fs.readFile("./data/slots.json", "utf-8");
+    let slots = JSON.parse(slotsData);
+
+    slots = slots.map((slot) => {
+      if (slot.slotId === bookingToCancel.slotId) {
+        return {
+          ...slot,
+          status: "available",
+          reservedFor: null,
+          permanentUserId: null,
+        };
+      }
+      return slot;
+    });
+
+    await fs.writeFile("./data/slots.json", JSON.stringify(slots, null, 2));
+
+    // (Optional) Preserve cancelled booking
+    const cancelledData = await fs
+      .readFile("./data/cancelledBookings.json", "utf-8")
+      .catch(() => "[]");
+    const cancelledBookings = JSON.parse(cancelledData);
+
+    cancelledBookings.push({
+      ...bookingToCancel,
+      cancelledAt: new Date().toISOString(),
+    });
+
+    await fs.writeFile(
+      "./data/cancelledBookings.json",
+      JSON.stringify(cancelledBookings, null, 2)
+    );
+
+    res.json({ message: "Booking cancelled successfully" });
+  } catch (err) {
+    console.error("Cancel booking error:", err);
+    res.status(500).json({ error: "Failed to cancel booking" });
   }
 });
 

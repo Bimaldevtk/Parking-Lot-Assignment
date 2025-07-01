@@ -1,23 +1,17 @@
-import { useReducer, useEffect } from "react";
+import { useReducer } from "react";
 import styles from "./CheckInForm.module.css";
 import { useNavigate } from "react-router-dom";
-import { formReducer, initialState } from "../../store/form_reducer";
 import { getMinDate } from "../helperFunctions";
 import { getDaysBetween } from "../helperFunctions";
-import { createBooking, fetchAvailableSlots } from "../../api/api";
+import { fetchAvailableSlots } from "../../api/api";
+import { formReducer, initialState } from "../../store/form_reducer";
 
 export default function CheckInForm() {
   const navigate = useNavigate();
-
-  const [state, dispatch] = useReducer(formReducer, initialState);
   const user = JSON.parse(localStorage.getItem("userInfo"));
-  useEffect(() => {
-    if (state.startDate && state.endDate) {
-      fetchAvailableSlots(state, dispatch);
-    }
-  }, [state]);
+  const [state, dispatch] = useReducer(formReducer, initialState);
 
-  const handleSubmit = async (e) => {
+  const handleCheckSlots = async (e) => {
     e.preventDefault();
 
     if (!user) {
@@ -29,6 +23,7 @@ export default function CheckInForm() {
     const today = new Date();
     const start = new Date(state.startDate);
     const end = new Date(state.endDate);
+    const days = getDaysBetween(state.startDate, state.endDate);
 
     if (start <= today) {
       alert("Booking must start from tomorrow or later.");
@@ -40,50 +35,30 @@ export default function CheckInForm() {
       return;
     }
 
-    const days = getDaysBetween(state.startDate, state.endDate);
     if (days > 3) {
       alert("You can book for a maximum of 3 days.");
       return;
     }
 
-    if (!state.selectedSlotId) {
-      alert("Slot is not available.");
+    // Fetch available slots from API
+    const availableSlots = await fetchAvailableSlots(state);
+
+    if (!availableSlots || availableSlots.length === 0) {
+      alert("No slots available for the selected criteria.");
       return;
     }
 
-    const bookingDates = [];
-    let curr = new Date(state.startDate);
-    while (curr <= end) {
-      bookingDates.push(curr.toISOString().split("T")[0]);
-      curr.setDate(curr.getDate() + 1);
-    }
+    // Save to local storage for temporary page
+    localStorage.setItem("availableSlots", JSON.stringify(availableSlots));
+    localStorage.setItem("formState", JSON.stringify(state));
 
-    const selectedSlot = state.availableSlots.find(
-      (slot) => slot.slotId == state.selectedSlotId
-    );
-
-    console.log(selectedSlot);
-
-    if (!selectedSlot) {
-      alert("Selected slot not found.");
-      return;
-    }
-
-    const bookingPayload = {
-      userId: user.id,
-      slotId: state.selectedSlotId,
-      startDate: state.startDate,
-      endDate: state.endDate,
-      vehicleType: selectedSlot.vehicleType,
-    };
-    createBooking(bookingPayload, navigate);
-    localStorage.setItem("bookingInfo", JSON.stringify(bookingPayload));
+    navigate("/temporary");
   };
 
   return (
     <div className={styles.main_container}>
       <div className={styles.container}>
-        <form onSubmit={handleSubmit} className={styles.form_content}>
+        <form onSubmit={handleCheckSlots} className={styles.form_content}>
           <div className={styles.date_wrapper}>
             <label className={styles.label}>Check In</label>
             <input
@@ -91,7 +66,7 @@ export default function CheckInForm() {
               type="date"
               required
               min={getMinDate(1)}
-              value={state.startDate}
+              value={state.startDate || ""}
               onChange={(e) =>
                 dispatch({
                   type: "SET_FIELD",
@@ -101,14 +76,15 @@ export default function CheckInForm() {
               }
             />
           </div>
-          <div>
+
+          <div className={styles.date_wrapper}>
             <label className={styles.label}>Check Out</label>
             <input
-              placeholder="Select Date"
               className={styles.input}
               type="date"
+              required
               min={getMinDate(1)}
-              value={state.endDate}
+              value={state.endDate || ""}
               onChange={(e) =>
                 dispatch({
                   type: "SET_FIELD",
@@ -116,38 +92,50 @@ export default function CheckInForm() {
                   value: e.target.value,
                 })
               }
-              required
             />
           </div>
-          <div>
-            <label className={styles.select_slot}>Select Slot</label>
+
+          <div className={styles.date_wrapper}>
+            <label className={styles.label}>Vehicle Type</label>
             <select
               className={styles.input}
-              value={state.selectedSlotId}
+              required
+              value={state.vehicleType || ""}
               onChange={(e) =>
                 dispatch({
                   type: "SET_FIELD",
-                  field: "selectedSlotId",
+                  field: "vehicleType",
+                  value: e.target.value,
+                })
+              }
+            >
+              <option value="">-- Select Vehicle Type --</option>
+              <option value="2-wheeler">2-wheeler</option>
+              <option value="4-wheeler">4-wheeler</option>
+            </select>
+          </div>
+
+          <div className={styles.date_wrapper}>
+            <label className={styles.label}>Vehicle Number</label>
+            <input
+              className={styles.input}
+              type="text"
+              placeholder="e.g., KL07AB1234"
+              value={state.vehicleNumber || ""}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_FIELD",
+                  field: "vehicleNumber",
                   value: e.target.value,
                 })
               }
               required
-              disabled={state.availableSlots.length === 0}
-            >
-              <option value="">
-                {state.availableSlots.length === 0
-                  ? "Check Slot"
-                  : "-- Choose a slot --"}
-              </option>
-              {state.availableSlots.map((slot) => (
-                <option key={slot.slotId} value={slot.slotId}>
-                  Slot no :{slot.slotId} - {slot.vehicleType}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
-          <button className={styles.book_now}>Book Now</button>
+          <button type="submit" className={styles.book_now}>
+            Check Available Slots
+          </button>
         </form>
       </div>
     </div>

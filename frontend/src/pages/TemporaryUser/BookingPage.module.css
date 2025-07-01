@@ -1,0 +1,39 @@
+.wrapper {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.card {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 1.5rem;
+  background-color: #fff;
+  margin: 1rem 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+}
+
+.ok {
+  background-color: #fecb21;
+  color: black;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  margin-top: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cancel {
+  background-color: crimson;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  margin-top: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}

@@ -1,0 +1,12 @@
+.wrapper {
+  padding: 2rem;
+  background-color: #f4f4f4;
+  min-height: 100vh;
+}
+
+h2 {
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+  margin-bottom: 1rem;
+}
