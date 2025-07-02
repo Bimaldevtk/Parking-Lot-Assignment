@@ -1,16 +1,16 @@
 [
   {
-    "id": 1751389757877,
+    "id": 776343711,
     "userId": 5,
-    "slotId": 4,
-    "vehicleType": "2-wheeler",
-    "vehicleNumber": "Kl12",
+    "slotId": 1,
+    "vehicleType": "4-wheeler",
+    "vehicleNumber": "mnk",
     "startDate": "2025-07-02",
     "endDate": "2025-07-03",
     "date": "2025-07-03",
     "floorNo": 1,
     "location": "Smart City InfoPark Kochi",
-    "reservedFor": "permanent",
-    "isFromRelease": true
+    "reservedFor": "temporary",
+    "isFromRelease": false
   }
 ]

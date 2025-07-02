@@ -4,30 +4,20 @@
     "lotId": 1,
     "type": "4-wheeler",
     "status": "reserved",
-    "reservedFor": "temporary",
+    "reservedFor": null,
     "userId": 5,
     "floorNo": 1,
-    "location": "Smart City InfoPark Kochi"
+    "location": "Smart City InfoPark Kochi",
+    "permanentUserId": null
   },
   {
     "slotId": 2,
     "lotId": 1,
     "type": "2-wheeler",
     "status": "reserved",
-    "reservedFor": "temporary",
-    "userId": 2,
+    "reservedFor": null,
+    "userId": null,
     "floorNo": 2,
     "location": "Smart City InfoPark Kochi"
-  },
-  {
-    "slotId": 4,
-    "lotId": 1,
-    "type": "2-wheeler",
-    "status": "available",
-    "reservedFor": null,
-    "userId": 5,
-    "floorNo": 1,
-    "location": "Smart City InfoPark Kochi",
-    "permanentUserId": null
   }
 ]

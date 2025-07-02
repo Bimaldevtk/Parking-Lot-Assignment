@@ -195,9 +195,11 @@ router.post("/", async (req, res) => {
     }
 
     const isPermanent = slot.userId !== null;
+    const generateRandomId = () =>
+      Math.floor(100000000 + Math.random() * 900000000);
 
-    const newBookings = bookingDates.map((date, index) => ({
-      id: Date.now() + index,
+    const newBookings = bookingDates.map((date) => ({
+      id: generateRandomId(),
       userId,
       slotId,
       vehicleType,
@@ -242,63 +244,45 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const bookingId = Number(req.params.id);
+  const bookingId = parseInt(req.params.id);
 
   try {
-    // Load bookings
-    const bookingsData = await fs.readFile("./data/bookings.json", "utf-8");
-    const bookings = JSON.parse(bookingsData);
+    // Read bookings
+    const data = await fs.readFile("./data/bookings.json", "utf-8");
+    let bookings = JSON.parse(data);
 
-    const bookingToCancel = bookings.find((b) => b.id === bookingId);
-    if (!bookingToCancel) {
-      return res.status(404).json({ error: "Booking not found" });
+    // Find the booking
+    const booking = bookings.find((b) => b.id === bookingId);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
     }
 
     // Remove the booking
-    const updatedBookings = bookings.filter((b) => b.id !== bookingId);
+    bookings = bookings.filter((b) => b.id !== bookingId);
     await fs.writeFile(
       "./data/bookings.json",
-      JSON.stringify(updatedBookings, null, 2)
+      JSON.stringify(bookings, null, 2)
     );
 
-    // Restore slot
+    // Update slot
     const slotsData = await fs.readFile("./data/slots.json", "utf-8");
     let slots = JSON.parse(slotsData);
-
     slots = slots.map((slot) => {
-      if (slot.slotId === bookingToCancel.slotId) {
+      if (slot.slotId === booking.slotId) {
         return {
           ...slot,
-          status: "available",
           reservedFor: null,
           permanentUserId: null,
         };
       }
       return slot;
     });
-
     await fs.writeFile("./data/slots.json", JSON.stringify(slots, null, 2));
 
-    // (Optional) Preserve cancelled booking
-    const cancelledData = await fs
-      .readFile("./data/cancelledBookings.json", "utf-8")
-      .catch(() => "[]");
-    const cancelledBookings = JSON.parse(cancelledData);
-
-    cancelledBookings.push({
-      ...bookingToCancel,
-      cancelledAt: new Date().toISOString(),
-    });
-
-    await fs.writeFile(
-      "./data/cancelledBookings.json",
-      JSON.stringify(cancelledBookings, null, 2)
-    );
-
     res.json({ message: "Booking cancelled successfully" });
-  } catch (err) {
-    console.error("Cancel booking error:", err);
-    res.status(500).json({ error: "Failed to cancel booking" });
+  } catch (error) {
+    console.error("Delete booking error:", error.message);
+    res.status(500).json({ message: "Failed to cancel booking" });
   }
 });
 

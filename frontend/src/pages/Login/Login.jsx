@@ -25,6 +25,7 @@ export default function Login() {
 
       const data = await response.json();
       const user = data.user;
+      console.log(user);
 
       if (response.ok) {
         dispatch(setUserInfo(user));
@@ -33,23 +34,34 @@ export default function Login() {
         const isBooked = booking?.length > 0;
 
         alert(data.message);
-        if (user.role === "user") {
-          if (user.isPermanent) {
-            navigate("/permanent");
-          } else if (!user.isPermanent && isBooked) {
-            navigate("/booked");
-          } else if (!user.isPermanent && !isBooked) {
-            navigate("/");
-          }
+
+        const redirectTo = localStorage.getItem("redirectTo");
+        const tempData = JSON.parse(localStorage.getItem("redirectTempData"));
+
+        if (tempData) {
+          localStorage.setItem("formState", JSON.parse(tempData.form));
+          localStorage.setItem("availableSlots", JSON.parse(tempData.slots));
+          localStorage.removeItem("redirectTempData");
         }
-      } else {
-        alert(data.message);
+
+        if (redirectTo) {
+          localStorage.removeItem("redirectTo");
+          navigate(redirectTo);
+          return;
+        }
+        console.log(user.isPermanent);
+
+        const isPermanent = user.isPermanent === true;
+        if (isPermanent) {
+          navigate("/permanent");
+        } else if (!isPermanent && isBooked) {
+          navigate("/booked");
+        }
       }
     } catch (err) {
-      alert("error in Connecting Server");
+      alert("Error connecting to server");
       console.log(err);
     }
-    alert(`Login clicked: ${username}`);
   };
 
   return (

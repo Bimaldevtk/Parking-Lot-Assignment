@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ParkingSlotSelector from "../../components/ParkingSlot/ParkingSlot";
 import styles from "./TemporaryPage.module.css";
 
@@ -14,14 +14,13 @@ export default function TemporaryPage() {
 
     if (!available || !Array.isArray(available) || !form) {
       alert("No slots or form data found");
-      navigate("/");
+      navigate("/home");
     } else {
       setSlots(available);
       setFormState(form);
     }
   }, [navigate]);
 
-  // ✅ This will be called after booking succeeds
   const handleSuccess = (booking) => {
     localStorage.setItem("bookingInfo", JSON.stringify(booking));
     navigate("/booked");
@@ -33,7 +32,7 @@ export default function TemporaryPage() {
       <ParkingSlotSelector
         slots={slots}
         formState={formState}
-        onBookSuccess={handleSuccess} // ✅ passed correctly here
+        onBookSuccess={handleSuccess}
       />
     </div>
   );

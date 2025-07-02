@@ -11,11 +11,11 @@ export default function BookedPage() {
     const bookingInfo = JSON.parse(localStorage.getItem("bookingInfo"));
     if (!bookingInfo) {
       alert("No booking found");
-      navigate("/");
+      navigate("/home");
     } else {
       setBooking(bookingInfo);
     }
-  }, []);
+  }, [navigate]);
 
   const handleCancel = async () => {
     if (!booking?.id) {
@@ -32,7 +32,7 @@ export default function BookedPage() {
       await cancelBooking(booking.id);
       alert("Booking cancelled successfully");
       localStorage.removeItem("bookingInfo");
-      navigate("/my-bookings");
+      navigate("/home");
     } catch (error) {
       alert("Failed to cancel booking: " + error.message);
     }
@@ -67,7 +67,6 @@ export default function BookedPage() {
         </p>
       </div>
 
-      {/* ✅ Cancel My Booking Button */}
       <button className={styles.cancel} onClick={handleCancel}>
         Cancel My Booking
       </button>

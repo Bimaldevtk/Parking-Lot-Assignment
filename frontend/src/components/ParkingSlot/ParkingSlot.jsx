@@ -12,10 +12,6 @@ export default function ParkingSlotSelector({
 
   const handleBookSlot = async (slot) => {
     const user = JSON.parse(localStorage.getItem("userInfo"));
-    if (!user) {
-      alert("Please login");
-      return;
-    }
 
     const payload = {
       userId: user.id,

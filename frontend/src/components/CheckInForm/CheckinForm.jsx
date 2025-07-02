@@ -1,24 +1,24 @@
-import { useReducer } from "react";
+import { useReducer, useEffect } from "react";
 import styles from "./CheckInForm.module.css";
 import { useNavigate } from "react-router-dom";
-import { getMinDate } from "../helperFunctions";
-import { getDaysBetween } from "../helperFunctions";
+import { getMinDate, getDaysBetween } from "../helperFunctions";
 import { fetchAvailableSlots } from "../../api/api";
 import { formReducer, initialState } from "../../store/form_reducer";
 
 export default function CheckInForm() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("userInfo"));
   const [state, dispatch] = useReducer(formReducer, initialState);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    if (!user) {
+      alert("Please login to continue");
+      navigate("/");
+    }
+  }, [navigate]);
 
   const handleCheckSlots = async (e) => {
     e.preventDefault();
-
-    if (!user) {
-      alert("Please login");
-      navigate("/login");
-      return;
-    }
 
     const today = new Date();
     const start = new Date(state.startDate);
@@ -40,7 +40,6 @@ export default function CheckInForm() {
       return;
     }
 
-    // Fetch available slots from API
     const availableSlots = await fetchAvailableSlots(state);
 
     if (!availableSlots || availableSlots.length === 0) {
@@ -48,7 +47,6 @@ export default function CheckInForm() {
       return;
     }
 
-    // Save to local storage for temporary page
     localStorage.setItem("availableSlots", JSON.stringify(availableSlots));
     localStorage.setItem("formState", JSON.stringify(state));
 

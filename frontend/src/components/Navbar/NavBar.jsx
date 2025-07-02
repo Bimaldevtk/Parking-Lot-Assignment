@@ -14,9 +14,9 @@ export default function Navbar() {
     if (loggedIn) {
       localStorage.removeItem("userInfo");
       setLoggedIn(false);
-      navigate("/");
+      navigate("/home");
     } else {
-      navigate("/login");
+      navigate("/");
     }
   }
 
